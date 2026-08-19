@@ -1,5 +1,4 @@
 import mongoose, {Schema} from 'mongoose'
-import { uppercase } from 'zod'
 
 const clubSchema = new Schema(
     {
