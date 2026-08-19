@@ -1,5 +1,4 @@
 import mongoose, {Schema} from "mongoose";
-import { lowercase, uppercase } from "zod";
 
 const userSchema = new Schema(
     {
