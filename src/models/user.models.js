@@ -1,33 +1,34 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
-    {
-        Name: {
-            type: String,
-            req: true,
-        },
-        Email:{
-            type: String,
-            req: true,
-            unique: true,
-            lowercase: true
-        },
-        RegisterationNumber: {
-            type: String,
-            unique: true,
-            uppercase: true,
-            req: true,
-        },
-        Branch:{
-            type: String,
-            req: true,
-            uppercase: true,
-        },
-        YearOfStudy:{
-            req: true,
-            type: Number,
+  {
+    Name: {
+      type: String,
+      required: true,
+    },
+    Email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    RegisterationNumber: {
+      type: String,
+      unique: true,
+      uppercase: true,
+      required: true,
+    },
+    Branch: {
+      type: String,
+      required: true,
+      uppercase: true,
+    },
+    YearOfStudy: {
+      required: true,
+      type: Number,
+    },
+  },
+  { timestamps: true }
+);
 
-        }
-}, {timestamps: true})
-
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema);
