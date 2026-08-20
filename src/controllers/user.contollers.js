@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/AyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js"
 import { apiResponse } from "../utils/ApiResponse.js"
-import { User } from "../models/user.models.js"
 import { Event } from "../models/event.models.js"
 import { Club } from "../models/club.models.js"
 
@@ -88,4 +87,6 @@ const registerEvent = asyncHandler(async  (req,res) => {
 
     return res.status(201).json(new apiResponse(200, eventRegistered, "Event Registered Successfully!!!"))
 })
+
+export { registerEvent }
 
