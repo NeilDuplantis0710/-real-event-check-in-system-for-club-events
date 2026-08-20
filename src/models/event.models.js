@@ -2,6 +2,10 @@ import mongoose, {Schema} from "mongoose";
 
 const eventSchema = new Schema(
     {
+        ClubName = {
+            type: Schema.Types.ObjectId,
+            ref: "Club"
+        },
         EventName = {
             req: true,
             type: String,
