@@ -1,9 +1,30 @@
 import mongoose, {Schema} from "mongoose";
 
 const registerationSchema = new Schema({
-    users: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User"
+    Name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    EventName: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    Email: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    RegisterationNumber: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    ClubName: {
+        type: String,
+        required: true,
+        trim: true
     }
 },{timestamps: true})
 
