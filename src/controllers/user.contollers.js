@@ -22,56 +22,52 @@ const registerEvent = asyncHandler(async  (req,res) => {
     console.log("Status: ", Status)
     console.log("Venue: ", Venue)
 
-    if(!ClubName && ClubName == ""){
+    if(!ClubName || ClubName === ""){
         throw new ApiError(400, "Club name is required.")
     }
-    if(!EventName && EventName == ""){
+    if(!EventName || EventName === ""){
         throw new ApiError(400, "Event name is required.")
     }
-    if(!EventDate && EventDate == ""){
+    if(!EventDate || EventDate === ""){
         throw new ApiError(400, "Event Date is required.")
     }
-    if(!StudentCoordinator && StudentCoordinator == ""){
+    if(!StudentCoordinator || StudentCoordinator === ""){
         throw new ApiError(400, "Student Coordinator name is required")
     }
-    if(!FacultyCoordinator && FacultyCoordinator == ""){
+    if(!FacultyCoordinator || FacultyCoordinator === ""){
         throw new ApiError(400, "Faculty Coordinator name is required")
     }
-    if(!StartTime && StartTime == ""){
+    if(!StartTime || StartTime === ""){
         throw new ApiError(400, "Start Time is required")
     }
-    if(!EndTime && EndTime == ""){
+    if(!EndTime || EndTime === ""){
         throw new ApiError(400, "End Time of the Event is required")
     }
-    if(!Status && Status == ""){
+    if(!Status || Status === ""){
         throw new ApiError(400, "Event Status is required")
     }
-    if(!Venue && Venue == ""){
+    if(!Venue || Venue === ""){
         throw new ApiError(400, "Venue is required")
     }
 
-    // Checking for an already existing event
-    const existingEvent = await User.findOne({
-        $or: [{EventName}]
-    })
+    // Checking for an already existing event (by name)
+    const existingEvent = await Event.findOne({ EventName })
 
     if(existingEvent){
         throw new ApiError(409, "An event of this name already exists.")
     }
 
     // Creating entry in the database
-
     const event = await Event.create({
         ClubName,
+        EventName,
         EventDate, 
         StudentCoordinator,
         FacultyCoordinator,
         StartTime,
         EndTime,
         Venue,
-        Status,
-        EventDate,
-        EventName
+        Status
     })
 
     
@@ -88,5 +84,28 @@ const registerEvent = asyncHandler(async  (req,res) => {
     return res.status(201).json(new apiResponse(200, eventRegistered, "Event Registered Successfully!!!"))
 })
 
-export { registerEvent }
+//Create a club
+
+const createClub = asyncHandler(async (req,res) => {
+
+    const { ClubName } = req.body
+
+    if(!ClubName || ClubName == ""){
+        throw new ApiError(400, "A name is a must to create a club")
+    }
+
+    const club = await Club.create({
+        ClubName
+    })
+
+    const clubCreated = await Club.findById(club._id)
+
+    if(!clubCreated){
+        throw new ApiError(500, "Club could not be created!!")
+    }
+
+    return res.status(201).json(new apiResponse(200, clubCreated, "Congratulations!!! Club has been successfully registered!!"))
+})
+
+export { registerEvent, createClub }
 
