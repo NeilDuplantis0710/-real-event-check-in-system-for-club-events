@@ -34,6 +34,10 @@ const eventSchema = new Schema(
         Status:{
             req: true,
             type: String
+        }, 
+        Venue: {
+            req: true,
+            type: String
         }
     },{timestamps: true})
 
