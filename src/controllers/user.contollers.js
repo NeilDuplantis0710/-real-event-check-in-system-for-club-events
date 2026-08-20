@@ -7,8 +7,8 @@ import { Club } from "../models/club.models.js"
 
 
 
-// Event Registeration
-const registerEvent = asyncHandler(async  (req,res) => {
+// Event Creation
+const createEvent = asyncHandler(async  (req,res) => {
 
     const { ClubName, EventName, EventDate, StudentCoordinator, FacultyCoordinator, StartTime, EndTime, Status, Venue } = req.body
 
@@ -128,5 +128,9 @@ const viewAllClubs = asyncHandler(async (req,res) => {
     res.status(200).json(new apiResponse(200, clubs, "All the clubs registered are here!!!"))
 })
 
-export { registerEvent, createClub, viewAllEvents, viewAllClubs }
+const eventRegisteration = asyncHandler(async (req,res) => {
+
+})
+
+export { createEvent, createClub, viewAllEvents, viewAllClubs }
 
