@@ -89,7 +89,6 @@ const createEvent = asyncHandler(async (req, res) => {
 })
 
 //Create a club
-
 const createClub = asyncHandler(async (req, res) => {
 
     const { ClubName } = req.body
