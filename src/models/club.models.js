@@ -2,7 +2,7 @@ import mongoose, {Schema} from 'mongoose'
 
 const clubSchema = new Schema(
     {
-        Name: {
+        ClubName: {
             required: true,
             type: String,
             unique: true,
