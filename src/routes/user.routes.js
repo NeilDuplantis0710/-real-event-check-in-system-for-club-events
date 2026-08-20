@@ -1,10 +1,14 @@
 import { Router } from "express"
 import { registerEvent } from "../controllers/user.contollers.js"
 import { createClub } from "../controllers/user.contollers.js"
+import { viewAllEvents } from "../controllers/user.contollers.js"
+import { viewAllClubs } from "../controllers/user.contollers.js"
 
 const router = Router()
 
 router.route("/registerEvent").post(registerEvent)
 router.route("/createClub").post(createClub)
+router.route("/viewAllEvents").get(viewAllEvents)
+router.route("/viewAllClubs").get(viewAllClubs)
 
 export default router

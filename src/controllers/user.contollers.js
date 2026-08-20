@@ -81,7 +81,7 @@ const registerEvent = asyncHandler(async  (req,res) => {
 
     // return response
 
-    return res.status(201).json(new apiResponse(200, eventRegistered, "Event Registered Successfully!!!"))
+    return res.status(201).json(new apiResponse(201, eventRegistered, "Event Registered Successfully!!!"))
 })
 
 //Create a club
@@ -104,8 +104,29 @@ const createClub = asyncHandler(async (req,res) => {
         throw new ApiError(500, "Club could not be created!!")
     }
 
-    return res.status(201).json(new apiResponse(200, clubCreated, "Congratulations!!! Club has been successfully registered!!"))
+    return res.status(201).json(new apiResponse(201, clubCreated, "Congratulations!!! Club has been successfully registered!!"))
 })
 
-export { registerEvent, createClub }
+const viewAllEvents = asyncHandler(async (req,res) => {
+    const events = await Event.find({})
+
+    if(!events){
+        throw new ApiError(400, "No events going on right now!!")
+    }
+
+    return res.status(201).json(new apiResponse(201, events, "All the events available are here for the display."))
+})
+
+const viewAllClubs = asyncHandler(async (req,res) => {
+
+    const clubs = await Club.find({})
+
+    if(!clubs || clubs.length === 0){
+        throw new ApiError(400, "No Clubs are registered right now!!!")
+    }
+
+    res.status(200).json(new apiResponse(200, clubs, "All the clubs registered are here!!!"))
+})
+
+export { registerEvent, createClub, viewAllEvents, viewAllClubs }
 
