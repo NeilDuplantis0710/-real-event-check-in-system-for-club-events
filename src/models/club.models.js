@@ -3,8 +3,8 @@ import mongoose, {Schema} from 'mongoose'
 const clubSchema = new Schema(
     {
         Name: {
-            req: true,
-            type: String, 
+            required: true,
+            type: String,
             unique: true,
             uppercase: true
         },
@@ -15,4 +15,7 @@ const clubSchema = new Schema(
     },{timestamps: true})
 
 
-export default Club = mongoose.Schema("Club", clubSchema)
+const Club = mongoose.model("Club", clubSchema)
+
+export default Club
+export { Club }
