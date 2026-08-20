@@ -39,6 +39,10 @@ const eventSchema = new Schema(
         Venue: {
             req: true,
             type: String
+        },
+        registeredUsers: {
+            type: mongoose.Schema.ObjectId,
+            ref: "Event"
         }
     },{timestamps: true})
 
