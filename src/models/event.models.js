@@ -2,11 +2,11 @@ import mongoose, {Schema} from "mongoose";
 
 const eventSchema = new Schema(
     {
-        ClubName = {
+        ClubName : {
             type: Schema.Types.ObjectId,
             ref: "Club"
         },
-        EventName = {
+        EventName : {
             req: true,
             type: String,
             unique: true
