@@ -1,6 +1,8 @@
-// import { Router } from "express"
-// import { refreshAccessToken, registerUser } from "../controllers/user.contollers.js"
-// import { upload } from "../middlewares/multer.middleware.js"
-// import { loginUser } from "../controllers/user.contollers.js"
-// import { logoutUser } from "../controllers/user.contollers.js"
-// import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { Router } from "express"
+import { registerEvent } from "../controllers/user.contollers.js"
+
+const router = Router()
+
+router.route("/registerEvent").post(registerEvent)
+
+export default router
