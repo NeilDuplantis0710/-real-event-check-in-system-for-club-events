@@ -4,6 +4,7 @@ import { User } from "../models/user.models.js"
 import { apiResponse } from "../utils/ApiResponse.js"
 import { Event } from "../models/event.models.js"
 import { Club } from "../models/club.models.js"
+import { Registeration } from "../models/registerations.models.js"
 
 
 
@@ -129,6 +130,25 @@ const viewAllClubs = asyncHandler(async (req,res) => {
 })
 
 const eventRegisteration = asyncHandler(async (req,res) => {
+
+    const { EventName, ClubName } = req.body
+    const {eventId} = req.params
+    const {clubId} = req.params
+
+    const event = await Event.findById(eventId)
+    if(!event){
+        throw new ApiError(400, "Event not found")
+    }
+    const club = await Club.findById(clubId)
+    if(!club){
+        throw new ApiError(400, "Club not found")
+    }
+
+    if(event.ClubName != club.ClubName){
+        throw new ApiError(400, "This event is not conducted by this club.")
+    }
+
+
 
 })
 
