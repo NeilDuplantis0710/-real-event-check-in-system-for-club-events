@@ -57,8 +57,15 @@ const createEvent = asyncHandler(async (req, res) => {
     // Checking for an already existing event (by name)
     const existingEvent = await Event.findOne({ EventName: eventName })
 
+    //Checking if the club does not exist
+    const existingClub = await Club.findOne({ClubName: clubName})
+
     if (existingEvent) {
         throw new ApiError(409, "An event of this name already exists.")
+    }
+
+    if(!existingClub){
+        throw new ApiError(409, "Club does not exist")
     }
 
     // Creating entry in the database
