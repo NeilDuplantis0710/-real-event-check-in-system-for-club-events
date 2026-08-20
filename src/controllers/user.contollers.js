@@ -113,6 +113,7 @@ const createClub = asyncHandler(async (req, res) => {
     return res.status(201).json(new apiResponse(201, clubCreated, "Congratulations!!! Club has been successfully registered!!"))
 })
 
+// View All Events
 const viewAllEvents = asyncHandler(async (req, res) => {
     const events = await Event.find({})
 
@@ -123,6 +124,7 @@ const viewAllEvents = asyncHandler(async (req, res) => {
     return res.status(201).json(new apiResponse(201, events, "All the events available are here for the display."))
 })
 
+// View All Clubs
 const viewAllClubs = asyncHandler(async (req, res) => {
 
     const clubs = await Club.find({})
@@ -134,6 +136,7 @@ const viewAllClubs = asyncHandler(async (req, res) => {
     res.status(200).json(new apiResponse(200, clubs, "All the clubs registered are here!!!"))
 })
 
+// Register for an event
 const eventRegisteration = asyncHandler(async (req, res) => {
 
     const { EventName, ClubName, Name, Email, RegisterationNumber } = req.body || {}
