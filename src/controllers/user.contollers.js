@@ -7,7 +7,41 @@ import { Club } from "../models/club.models.js"
 import { Registeration } from "../models/registerations.models.js"
 import QRCode from "qrcode";
 
+const getRegistrationIdFromBody = (body) => {
+    if (!body) return undefined
 
+    if (typeof body === "string") {
+        const trimmed = body.trim()
+        if (!trimmed) return undefined
+
+        try {
+            const parsed = JSON.parse(trimmed)
+            return getRegistrationIdFromBody(parsed)
+        } catch {
+            return trimmed
+        }
+    }
+
+    if (typeof body !== "object") return undefined
+
+    const possibleKeys = [
+        "registerationID",
+        "registrationID",
+        "registerationId",
+        "registrationId",
+        "_id",
+        "id"
+    ]
+
+    for (const key of possibleKeys) {
+        const value = body[key]
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+            return String(value)
+        }
+    }
+
+    return undefined
+}
 
 // Event Creation
 const createEvent = asyncHandler(async (req, res) => {
@@ -224,5 +258,41 @@ const eventRegisteration = asyncHandler(async (req, res) => {
 
 })
 
-export { createEvent, createClub, viewAllEvents, viewAllClubs, eventRegisteration }
+// Live display of the user verification of QR Code scanning.
+const checkedIn = asyncHandler(async (req,res) => {
+    const registerationID = getRegistrationIdFromBody(req.body)
+
+    if(!registerationID){
+        throw new ApiError(400, "RegisterationID is required!!!")
+    }
+
+    const registeration = await Registeration.findById(registerationID)
+
+    if(!registeration){
+        throw new ApiError(400, "Registeration not found!!!")
+    }
+
+    if(registeration.checkedIn){
+        throw new ApiError(400, "Already Registered!!!!")
+    }
+
+    registeration.checkedIn = true;
+    await registeration.save()
+
+    const checkedInList = await Registeration.find({
+        EventName: registeration.EventName,
+        checkedIn: true
+    })
+
+    const io = req.app.get("io")
+    io.emit("chekInUpdate", {
+        EventName: registeration.EventName,
+        checkedInCount: checkedInList.length,
+        checkedInList
+    })
+
+    return res.status(201).json(new apiResponse(201, registeration, "Checked in Successfully"))
+})
+
+export { createEvent, createClub, viewAllEvents, viewAllClubs, eventRegisteration, checkedIn}
 

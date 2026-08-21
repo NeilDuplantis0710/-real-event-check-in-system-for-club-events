@@ -25,6 +25,10 @@ const registerationSchema = new Schema({
         type: String,
         required: true,
         trim: true
+    },
+    checkedIn:{
+        type: Boolean,
+        default: false
     }
 },{timestamps: true})
 
