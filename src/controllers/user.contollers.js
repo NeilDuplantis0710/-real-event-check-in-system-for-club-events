@@ -5,6 +5,7 @@ import { apiResponse } from "../utils/ApiResponse.js"
 import { Event } from "../models/event.models.js"
 import { Club } from "../models/club.models.js"
 import { Registeration } from "../models/registerations.models.js"
+import QRCode from "qrcode";
 
 
 
@@ -58,13 +59,13 @@ const createEvent = asyncHandler(async (req, res) => {
     const existingEvent = await Event.findOne({ EventName: eventName })
 
     //Checking if the club does not exist
-    const existingClub = await Club.findOne({ClubName: clubName})
+    const existingClub = await Club.findOne({ ClubName: clubName })
 
     if (existingEvent) {
         throw new ApiError(409, "An event of this name already exists.")
     }
 
-    if(!existingClub){
+    if (!existingClub) {
         throw new ApiError(409, "Club does not exist")
     }
 
@@ -153,6 +154,15 @@ const eventRegisteration = asyncHandler(async (req, res) => {
     if (!ClubName || ClubName == "") {
         throw new ApiError(400, "Club name is required")
     }
+    if (!Name || Name.trim() === "") {
+        throw new ApiError(400, "Name is required")
+    }
+    if (!Email || Email.trim() === "") {
+        throw new ApiError(400, "Email is required")
+    }
+    if (!RegisterationNumber || RegisterationNumber.trim() === "") {
+        throw new ApiError(400, "Registration number is required")
+    }
 
     const event = await Event.findOne({ EventName: EventName.trim() })
     if (!event) {
@@ -168,7 +178,6 @@ const eventRegisteration = asyncHandler(async (req, res) => {
         throw new ApiError(400, "This event is not conducted by this club.")
     }
 
-
     const existingRegistration = await Registeration.findOne({
         EventName: event.EventName,
         $or: [
@@ -182,19 +191,36 @@ const eventRegisteration = asyncHandler(async (req, res) => {
     }
 
     const registeredEvent = await Registeration.create({
-        Name,
+        Name: Name.trim(),
         EventName: event.EventName,
         ClubName: club.ClubName,
-        Email,
-        RegisterationNumber
+        Email: Email.trim(),
+        RegisterationNumber: RegisterationNumber.trim()
     })
 
     if (!registeredEvent) {
         throw new ApiError(500, "Unable to register for the event!!!")
     }
-    
-    
-    return res.status(201).json(new apiResponse(201, registeredEvent, "Successfully registered for the event!!!"))
+
+    const qrData = JSON.stringify({
+        registerationID: registeredEvent._id,
+        EventName: registeredEvent.EventName,
+        ClubName: registeredEvent.ClubName,
+        Name: registeredEvent.Name,
+        Email: registeredEvent.Email,
+        RegisterationNumber: registeredEvent.RegisterationNumber
+    })
+
+    const qrCode = await QRCode.toDataURL(qrData)
+
+    if (!qrCode) {
+        throw new ApiError(500, "Unable to generate QR code after registration.")
+    }
+
+    return res.status(201).json(new apiResponse(201, {
+        registration: registeredEvent,
+        qrCode
+    }, "Successfully registered for the event!!!"))
 
 })
 
