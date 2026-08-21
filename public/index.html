@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventSync - Real-Time Club Event & Check-In Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="brand-title">EventSync</span>
+                        <span class="brand-tag">v1.0</span>
+                    </div>
+                </div>
+            </a>
+
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="clubs-tab">
+                    <i class="fa-solid fa-building-user"></i> Clubs
+                </button>
+                <button class="tab-btn" data-tab="events-tab">
+                    <i class="fa-solid fa-calendar-days"></i> Events
+                </button>
+                <button class="tab-btn" data-tab="register-tab">
+                    <i class="fa-solid fa-ticket"></i> Register & Ticket
+                </button>
+                <button class="tab-btn" data-tab="checkin-tab">
+                    <i class="fa-solid fa-camera-retro"></i> Live Check-In Desk
+                </button>
+            </nav>
+
+            <div class="status-badge" id="socket-status">
+                <span class="status-dot"></span>
+                <span id="socket-text">Socket Live</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+
+        <!-- TAB 1: CLUBS MANAGEMENT -->
+        <section id="clubs-tab" class="tab-content active">
+            <div class="grid-2">
+                <!-- Create Club Form -->
+                <div class="glass-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Create New Club
+                    </h2>
+                    <p class="card-subtitle">Register a new student organization or campus club.</p>
+
+                    <form id="create-club-form">
+                        <div class="form-group">
+                            <label class="form-label" for="club-name-input">Club Name</label>
+                            <input type="text" id="club-name-input" class="form-input" placeholder="e.g. ACM, IEEE, CYBERSEC" required uppercase>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-paper-plane"></i> Register Club
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Clubs List Grid -->
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h2 class="card-title">Registered Clubs</h2>
+                            <p class="card-subtitle" style="margin-bottom: 0;">Explore all active campus clubs</p>
+                        </div>
+                        <button class="btn btn-secondary" id="refresh-clubs-btn" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div id="clubs-list-container" class="cards-grid">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-spinner fa-spin empty-icon"></i>
+                            <p>Loading registered clubs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: EVENTS HUB -->
+        <section id="events-tab" class="tab-content">
+            <div class="grid-2">
+                <!-- Create Event Form -->
+                <div class="glass-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-calendar-plus" style="color: var(--accent-cyan);"></i> Host New Event
+                    </h2>
+                    <p class="card-subtitle">Schedule a new club event or workshop.</p>
+
+                    <form id="create-event-form">
+                        <div class="form-group">
+                            <label class="form-label" for="event-club-select">Conducting Club</label>
+                            <select id="event-club-select" class="form-select" required>
+                                <option value="">Select a Club...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="event-name-input">Event Title</label>
+                            <input type="text" id="event-name-input" class="form-input" placeholder="e.g. AI Hackathon 2026" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="event-date-input">Event Date</label>
+                                <input type="date" id="event-date-input" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="event-status-select">Status</label>
+                                <select id="event-status-select" class="form-select" required>
+                                    <option value="Upcoming">Upcoming</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="event-start-time">Start Time</label>
+                                <input type="time" id="event-start-time" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="event-end-time">End Time</label>
+                                <input type="time" id="event-end-time" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="event-venue-input">Venue / Location</label>
+                            <input type="text" id="event-venue-input" class="form-input" placeholder="e.g. Auditorium Hall 2" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="student-coord-input">Student Coordinator</label>
+                                <input type="text" id="student-coord-input" class="form-input" placeholder="Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="faculty-coord-input">Faculty Coordinator</label>
+                                <input type="text" id="faculty-coord-input" class="form-input" placeholder="Name" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-plus"></i> Create Event
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Events List Grid -->
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h2 class="card-title">Active & Upcoming Events</h2>
+                            <p class="card-subtitle" style="margin-bottom: 0;">Explore campus hackathons, workshops & meetups</p>
+                        </div>
+                        <button class="btn btn-secondary" id="refresh-events-btn" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div id="events-list-container" class="cards-grid">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-spinner fa-spin empty-icon"></i>
+                            <p>Loading events...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: STUDENT REGISTRATION & PASS -->
+        <section id="register-tab" class="tab-content">
+            <div class="grid-2">
+                <!-- Registration Form -->
+                <div class="glass-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-ticket" style="color: var(--accent-emerald);"></i> Event Registration
+                    </h2>
+                    <p class="card-subtitle">Register to receive your entry QR pass ticket instantly.</p>
+
+                    <form id="registration-form">
+                        <div class="form-group">
+                            <label class="form-label" for="reg-event-select">Select Event</label>
+                            <select id="reg-event-select" class="form-select" required>
+                                <option value="">Choose an Event...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="reg-club-name">Host Club</label>
+                            <input type="text" id="reg-club-name" class="form-input" placeholder="Select event above" readonly required style="opacity: 0.8; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="reg-student-name">Full Name</label>
+                            <input type="text" id="reg-student-name" class="form-input" placeholder="e.g. Alex Morgan" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="reg-student-email">Email Address</label>
+                            <input type="email" id="reg-student-email" class="form-input" placeholder="alex@university.edu" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="reg-student-id">Student Registration Number</label>
+                            <input type="text" id="reg-student-id" class="form-input" placeholder="e.g. 21BCE0452" required uppercase>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-block">
+                            <i class="fa-solid fa-qrcode"></i> Register & Generate Pass
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Digital Ticket Display Area -->
+                <div class="glass-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                    <div id="pass-placeholder" class="empty-state">
+                        <i class="fa-solid fa-ticket-simple empty-icon" style="font-size: 3.5rem; color: var(--primary);"></i>
+                        <h3 style="margin-top: 1rem; font-size: 1.2rem;">Your Digital Ticket Pass</h3>
+                        <p style="color: var(--text-muted); max-width: 320px; margin: 0.5rem auto;">Complete the registration form to view, download, or print your instant QR code entry pass.</p>
+                    </div>
+
+                    <div id="pass-display-container" style="display: none; width: 100%;">
+                        <!-- Dynamic Pass Inserted Here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: LIVE CHECK-IN DESK -->
+        <section id="checkin-tab" class="tab-content">
+            <div class="grid-2">
+                <!-- Check-in Controls & Scanner -->
+                <div class="glass-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-qrcode" style="color: var(--accent-rose);"></i> Attendance Verification
+                    </h2>
+                    <p class="card-subtitle">Scan attendee QR pass or enter Registration ID</p>
+
+                    <!-- Event Select for Check-in -->
+                    <div class="form-group">
+                        <label class="form-label" for="checkin-event-select">Active Event Desk</label>
+                        <select id="checkin-event-select" class="form-select">
+                            <option value="">Select Event to Monitor...</option>
+                        </select>
+                    </div>
+
+                    <!-- Live Counter Widget -->
+                    <div class="counter-box">
+                        <div class="counter-num" id="live-checkin-count">0</div>
+                        <div class="counter-label">Verified Attendees Checked-In</div>
+                    </div>
+
+                    <!-- Camera / File Scanner -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label class="form-label" style="margin: 0;">Camera QR Scanner</label>
+                            <button id="toggle-camera-btn" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                <i class="fa-solid fa-video"></i> Toggle Camera
+                            </button>
+                        </div>
+                        
+                        <div id="reader"></div>
+
+                        <div style="margin-top: 0.75rem;">
+                            <label class="form-label" for="qr-file-input">Or Upload QR Image File</label>
+                            <input type="file" id="qr-file-input" accept="image/*" class="form-input" style="padding: 0.5rem;">
+                        </div>
+                    </div>
+
+                    <div class="ticket-divider" style="margin: 1.5rem 0;"></div>
+
+                    <!-- Manual Entry Form -->
+                    <form id="manual-checkin-form">
+                        <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Manual ID / Payload Input</h4>
+                        <div class="form-group">
+                            <input type="text" id="manual-id-input" class="form-input" placeholder="Paste Registration ID or QR payload string" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-check-double"></i> Submit Manual Check-In
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Attendees Feed -->
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h2 class="card-title">Live Checked-In Attendees</h2>
+                            <p class="card-subtitle" style="margin-bottom: 0;">Real-time Socket.IO attendance feed</p>
+                        </div>
+                        <span class="badge-emerald" id="feed-event-badge">All Events</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Attendee Name</th>
+                                    <th>Reg. Number</th>
+                                    <th>Email</th>
+                                    <th>Event</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checkedin-table-body">
+                                <tr>
+                                    <td colspan="6" class="empty-state" style="padding: 2rem;">
+                                        <i class="fa-solid fa-clipboard-user empty-icon"></i>
+                                        <p>No check-ins recorded yet for this event.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- Socket.IO Client Library Served by Express -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- HTML5 QR Code Library CDN -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Main Application JavaScript -->
+    <script src="app.js"></script>
+
+</body>
+</html>

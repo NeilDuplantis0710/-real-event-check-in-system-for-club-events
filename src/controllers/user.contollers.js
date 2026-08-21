@@ -141,6 +141,11 @@ const createClub = asyncHandler(async (req, res) => {
 
     const clubName = ClubName.trim().toUpperCase()
 
+    const existingClub = await Club.findOne({ ClubName: clubName })
+    if (existingClub) {
+        throw new ApiError(409, "A club with this name already exists!")
+    }
+
     const club = await Club.create({
         ClubName: clubName
     })
@@ -157,24 +162,13 @@ const createClub = asyncHandler(async (req, res) => {
 // View All Events
 const viewAllEvents = asyncHandler(async (req, res) => {
     const events = await Event.find({})
-
-    if (!events) {
-        throw new ApiError(400, "No events going on right now!!")
-    }
-
-    return res.status(201).json(new apiResponse(201, events, "All the events available are here for the display."))
+    return res.status(200).json(new apiResponse(200, events || [], "All the events available are here for the display."))
 })
 
 // View All Clubs
 const viewAllClubs = asyncHandler(async (req, res) => {
-
     const clubs = await Club.find({})
-
-    if (!clubs || clubs.length === 0) {
-        throw new ApiError(400, "No Clubs are registered right now!!!")
-    }
-
-    res.status(200).json(new apiResponse(200, clubs, "All the clubs registered are here!!!"))
+    return res.status(200).json(new apiResponse(200, clubs || [], "All the clubs registered are here!!!"))
 })
 
 // Register for an event
@@ -285,14 +279,35 @@ const checkedIn = asyncHandler(async (req,res) => {
     })
 
     const io = req.app.get("io")
-    io.emit("chekInUpdate", {
-        EventName: registeration.EventName,
-        checkedInCount: checkedInList.length,
-        checkedInList
-    })
+    if (io) {
+        io.emit("chekInUpdate", {
+            EventName: registeration.EventName,
+            checkedInCount: checkedInList.length,
+            checkedInList
+        })
+    }
 
     return res.status(201).json(new apiResponse(201, registeration, "Checked in Successfully"))
 })
 
-export { createEvent, createClub, viewAllEvents, viewAllClubs, eventRegisteration, checkedIn}
+// Get list of checked-in attendees for an event
+const getCheckedInList = asyncHandler(async (req, res) => {
+    const { EventName } = req.query
+
+    const filter = { checkedIn: true }
+    if (EventName) {
+        filter.EventName = EventName
+    }
+
+    const checkedInList = await Registeration.find(filter)
+
+    return res.status(200).json(new apiResponse(200, {
+        EventName: EventName || "All",
+        checkedInCount: checkedInList.length,
+        checkedInList
+    }, "Checked-in attendees retrieved successfully."))
+})
+
+export { createEvent, createClub, viewAllEvents, viewAllClubs, eventRegisteration, checkedIn, getCheckedInList }
+
 
